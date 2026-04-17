@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Розрахунок матриці</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #f7efe9 0%, #efe3d8 100%);
+      color: #3a2f2a;
+    }
+    .container { max-width: 980px; margin: 0 auto; }
+    .card {
+      background: #fffaf6;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 12px 32px rgba(122, 88, 63, 0.12);
+      border: 1px solid #eadccf;
+    }
+    h1 { margin: 0 0 10px; text-align: center; font-size: 32px; }
+    .subtitle { text-align: center; color: #7b5d4f; margin-bottom: 24px; }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+    input, button {
+      padding: 16px 22px;
+      border-radius: 14px;
+      font-size: 17px;
+    }
+    input {
+      border: 1px solid #ccb9ab;
+      background: #fff;
+      min-width: 260px;
+      color: #3a2f2a;
+    }
+    button {
+      border: none;
+      background: #8b6b5a;
+      color: #fff;
+      cursor: pointer;
+      min-width: 220px;
+      font-weight: 600;
+      box-shadow: 0 6px 14px rgba(139, 107, 90, 0.18);
+    }
+    button:hover { opacity: 0.92; }
+    .result { display: none; }
+    .top-row {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .box {
+      background: #fffdfb;
+      border: 1px solid #eadccf;
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(122, 88, 63, 0.05);
+    }
+    .box-title { font-size: 13px; color: #7b5d4f; margin-bottom: 6px; }
+    .box-value { font-size: 26px; font-weight: 700; }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 3fr 1.1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .square {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid #eadccf;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fffdfb;
+      box-shadow: 0 4px 10px rgba(122, 88, 63, 0.05);
+    }
+    .cell {
+      min-height: 120px;
+      padding: 12px;
+      border-right: 1px solid #eadccf;
+      border-bottom: 1px solid #eadccf;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #fffaf7;
+    }
+    .cell:nth-child(3n) { border-right: none; }
+    .cell:nth-last-child(-n+3) { border-bottom: none; }
+    .cell-title { font-size: 14px; color: #7b5d4f; }
+    .cell-value { font-size: 28px; font-weight: 700; }
+    .side-col {
+      display: grid;
+      grid-template-rows: repeat(3, 120px);
+      gap: 12px;
+    }
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+      align-items: start;
+    }
+    .cta-wrap { display: flex; justify-content: center; margin-top: 20px; }
+    .brand {
+      text-align: right;
+      margin-top: 30px;
+      font-size: 22px;
+      font-family: Georgia, serif;
+      color: #7b5d4f;
+    }
+    @media (max-width: 820px) {
+      .top-row, .main-grid, .bottom-row { grid-template-columns: 1fr; }
+      .side-col { grid-template-rows: auto; }
+      .cell { min-height: 96px; }
+      .cell-value { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Розрахунок матриці</h1>
+      <div class="subtitle">Введіть дату у форматі ДД.ММ.РРРР</div>
+
+      <div class="controls">
+        <input type="text" id="birthdate" placeholder="08.03.1998">
+        <button type="button" id="calcBtn">Розрахувати</button>
+      </div>
+
+      <div class="result" id="result">
+        <div class="top-row">
+          <div class="box"><div class="box-title">Дата</div><div class="box-value" id="showDate">—</div></div>
+          <div class="box"><div class="box-title">Число долі</div><div class="box-value" id="fateNumber">—</div></div>
+          <div class="box"><div class="box-title">Темперамент</div><div class="box-value" id="temperament">—</div></div>
+        </div>
+
+        <div class="main-grid">
+          <div class="square">
+            <div class="cell"><div class="cell-title">Характер</div><div class="cell-value" id="d1">—</div></div>
+            <div class="cell"><div class="cell-title">Здоров'я</div><div class="cell-value" id="d4">—</div></div>
+            <div class="cell"><div class="cell-title">Удача</div><div class="cell-value" id="d7">—</div></div>
+
+            <div class="cell"><div class="cell-title">Енергія</div><div class="cell-value" id="d2">—</div></div>
+            <div class="cell"><div class="cell-title">Логіка</div><div class="cell-value" id="d5">—</div></div>
+            <div class="cell"><div class="cell-title">Борг</div><div class="cell-value" id="d8">—</div></div>
+
+            <div class="cell"><div class="cell-title">Інтерес</div><div class="cell-value" id="d3">—</div></div>
+            <div class="cell"><div class="cell-title">Праця</div><div class="cell-value" id="d6">—</div></div>
+            <div class="cell"><div class="cell-title">Пам'ять</div><div class="cell-value" id="d9">—</div></div>
+          </div>
+
+          <div class="side-col">
+            <div class="box"><div class="box-title">Ціль</div><div class="box-value" id="goal">—</div></div>
+            <div class="box"><div class="box-title">Сім'я</div><div class="box-value" id="family">—</div></div>
+            <div class="box"><div class="box-title">Звички</div><div class="box-value" id="habits">—</div></div>
+          </div>
+        </div>
+
+        <div class="bottom-row">
+          <div></div>
+          <div class="box"><div class="box-title">Побут</div><div class="box-value" id="lifeStyle">—</div></div>
+          <div></div>
+        </div>
+
+        <div class="cta-wrap">
+          <a href="https://t.me/k_n_v_1998?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D0%BC%D0%BE%D0%B2%D0%B8%D1%82%D0%B8%20%D1%80%D0%BE%D0%B7%D0%B1%D1%96%D1%80." target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; justify-content:center; min-width:240px; padding:18px 26px; border-radius:14px; background:#8b6b5a; color:#fff; text-decoration:none; font-size:18px; font-weight:600; box-shadow:0 6px 14px rgba(139, 107, 90, 0.18);">Замовити розбір</a>
+        </div>
+      </div>
+
+      <div class="brand">Natali Kirilovskaya</div>
+    </div>
+  </div>
+
+  <script>
+    function sumDigits(n) {
+      return String(n).split('').reduce(function(s, d) { return s + Number(d); }, 0);
+    }
+
+    function reduceFate(num) {
+      if (num === 11) return 11;
+      while (num > 9) {
+        num = sumDigits(num);
+        if (num === 11) return 11;
+      }
+      return num;
+    }
+
+    function countDigits(arr) {
+      var c = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+      arr.forEach(function(n) {
+        if (n >= 1 && n <= 9) c[n] += 1;
+      });
+      return c;
+    }
+
+    function repeatDigit(digit, count) {
+      return count > 0 ? String(digit).repeat(count) : '—';
+    }
+
+    function metricOrDash(value) {
+      return value > 0 ? String(value) : '—';
+    }
+
+    function parseDate(input) {
+      var match = input.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+      if (!match) return null;
+      var day = match[1], month = match[2], year = match[3];
+      var dd = Number(day), mm = Number(month), yyyy = Number(year);
+      if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return null;
+      return { day: day, month: month, year: year };
+    }
+
+    function calculatePythagoras() {
+      var input = document.getElementById('birthdate').value;
+      var parsed = parseDate(input);
+      if (!parsed) {
+        alert('Введіть дату у форматі ДД.ММ.РРРР');
+        return;
+      }
+
+      var day = parsed.day;
+      var month = parsed.month;
+      var year = parsed.year;
+
+      var dateDigits = (day + month + year).split('').map(function(ch) { return Number(ch); });
+      var firstAdditional = dateDigits.reduce(function(a, b) { return a + b; }, 0);
+      var secondAdditional = sumDigits(firstAdditional);
+      var firstDayDigit = Number(day[0]) === 0 ? Number(day[1]) : Number(day[0]);
+      var thirdAdditional = firstAdditional - 2 * firstDayDigit;
+      var fourthAdditional = sumDigits(thirdAdditional);
+
+      var all = []
+        .concat(dateDigits)
+        .concat(String(firstAdditional).split('').map(function(ch) { return Number(ch); }))
+        .concat(String(secondAdditional).split('').map(function(ch) { return Number(ch); }))
+        .concat(String(thirdAdditional).split('').map(function(ch) { return Number(ch); }))
+        .concat(String(fourthAdditional).split('').map(function(ch) { return Number(ch); }));
+
+      var c = countDigits(all);
+
+      document.getElementById('showDate').textContent = input.trim();
+      document.getElementById('fateNumber').textContent = reduceFate(firstAdditional);
+      document.getElementById('temperament').textContent = metricOrDash(c[3] + c[5] + c[7]);
+
+      document.getElementById('d1').textContent = repeatDigit(1, c[1]);
+      document.getElementById('d2').textContent = repeatDigit(2, c[2]);
+      document.getElementById('d3').textContent = repeatDigit(3, c[3]);
+      document.getElementById('d4').textContent = repeatDigit(4, c[4]);
+      document.getElementById('d5').textContent = repeatDigit(5, c[5]);
+      document.getElementById('d6').textContent = repeatDigit(6, c[6]);
+      document.getElementById('d7').textContent = repeatDigit(7, c[7]);
+      document.getElementById('d8').textContent = repeatDigit(8, c[8]);
+      document.getElementById('d9').textContent = repeatDigit(9, c[9]);
+
+      document.getElementById('goal').textContent = metricOrDash(c[1] + c[4] + c[7]);
+      document.getElementById('family').textContent = metricOrDash(c[2] + c[5] + c[8]);
+      document.getElementById('habits').textContent = metricOrDash(c[3] + c[6] + c[9]);
+      document.getElementById('lifeStyle').textContent = metricOrDash(c[4] + c[5] + c[6]);
+
+      document.getElementById('result').style.display = 'block';
+    }
+
+    document.getElementById('calcBtn').addEventListener('click', calculatePythagoras);
+    
+  </script>
+</body>
+</html>
