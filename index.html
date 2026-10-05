@@ -559,12 +559,15 @@
     }
 
     function parseDate(input) {
-      var match = input.trim().match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-      if (!match) return null;
+      var cleaned = input.trim().replace(/\D/g, '');
 
-      var day = match[1];
-      var month = match[2];
-      var year = match[3];
+if (cleaned.length !== 8) return null;
+
+var day = cleaned.slice(0, 2);
+var month = cleaned.slice(2, 4);
+var year = cleaned.slice(4, 8);
+
+      
 
       var dd = Number(day);
       var mm = Number(month);
@@ -579,6 +582,19 @@
 
       return { day: day, month: month, year: year };
     }
+    document.getElementById('birthdate').addEventListener('input', function(e) {
+    var value = e.target.value.replace(/\D/g, '');
+
+    if (value.length > 2) {
+        value = value.slice(0, 2) + '.' + value.slice(2);
+    }
+
+    if (value.length > 5) {
+        value = value.slice(0, 5) + '.' + value.slice(5, 9);
+    }
+
+    e.target.value = value;
+});
 
     function calculatePythagoras() {
       var input = document.getElementById('birthdate').value;
